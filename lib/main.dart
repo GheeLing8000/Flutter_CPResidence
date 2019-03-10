@@ -1,0 +1,346 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import './tabs/residences.dart' as _firstTab;
+import './tabs/coworkspace.dart' as _secondTab;
+import './tabs/support.dart' as _thirdTab;
+import './screens/about.dart' as _aboutPage;
+import './screens/support.dart' as _supportPage;
+import './screens/residences.dart' as _residencesPage;
+import './screens/coworkspace.dart' as _coWorkSpacePage;
+import './screens/login.dart' as _loginPage;
+import './screens/lodgings.dart' as _lodgingsPage;
+import './screens/corporateactivity.dart' as _corporateActivityPage;
+import './screens/medicalactivity.dart' as _medicalActivityPage;
+import './screens/studentexchangeactivity.dart' as studentExchangeActivityPage;
+import './screens/privileges.dart' as privilegesPage;
+import './screens/privilegesdetails.dart' as privilegesDetailsPage;
+import './screens/registration.dart' as registrationPage;
+import './screens/lodgingsdetails.dart' as lodgingsDetailsPage;
+
+void main() => runApp(new MaterialApp(
+  title: 'Flutter Starter',
+  theme: new ThemeData(
+    primarySwatch: Colors.blueGrey,
+    scaffoldBackgroundColor: Colors.white,
+    primaryColor: Colors.blueGrey, backgroundColor: Colors.white
+  ),
+  home: new Tabs(),
+  onGenerateRoute: (RouteSettings settings) {
+    switch (settings.name) {
+      case '/about': return new FromRightToLeft(
+        builder: (_) => new _aboutPage.About(),
+        settings: settings,
+      );
+      case '/support': return new FromRightToLeft(
+        builder: (_) => new _supportPage.Support(),
+        settings: settings,
+      );
+      case '/residences': return new FromRightToLeft(
+        builder: (_) => new _residencesPage.Residences(),
+        settings: settings,
+      );
+      case '/coworkspace': return new FromRightToLeft(
+        builder: (_) => new _coWorkSpacePage.CoWorkSpace(),
+        settings: settings,
+      );
+      case '/lodgings': return new FromRightToLeft(
+        builder: (_) => new _lodgingsPage.Lodgings(),
+        settings: settings,
+      );
+      case '/medicalactivity': return new FromRightToLeft(
+        builder: (_) => new _medicalActivityPage.MedicalActivity(),
+        settings: settings,
+      );
+      case '/studentexchangeactivity': return new FromRightToLeft(
+        builder: (_) => new studentExchangeActivityPage.StudentExchangeActivity(),
+        settings: settings,
+      );
+      case '/privileges': return new FromRightToLeft(
+        builder: (_) => new privilegesPage.Privileges(),
+        settings: settings,
+      );
+      case '/lodgingsdetails': return new FromRightToLeft(
+        builder: (_) => new lodgingsDetailsPage.LodgingsDetails(),
+        settings: settings,
+      );
+      case '/login': return new FromRightToLeft(
+        builder: (_) => new _loginPage.Login(),
+        settings: settings,
+      );
+
+    }
+ },
+  routes: <String, WidgetBuilder> {
+     '/about': (BuildContext context) => new _aboutPage.About(),
+   }
+));
+
+class FromRightToLeft<T> extends MaterialPageRoute<T> {
+  FromRightToLeft({ WidgetBuilder builder, RouteSettings settings })
+    : super(builder: builder, settings: settings);
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+   Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child) {
+
+    if (settings.isInitialRoute)
+      return child;
+
+    return new SlideTransition(
+      child: new Container(
+        decoration: new BoxDecoration(
+          boxShadow: [
+            new BoxShadow(
+              color: Colors.black26,
+              blurRadius: 25.0,
+            )
+          ]
+        ),
+        child: child,
+      ),
+      position: new Tween<Offset>(
+        begin: const Offset(1.0, 0.0),
+        end: Offset.zero,
+     )
+      .animate(
+        new CurvedAnimation(
+          parent: animation,
+         curve: Curves.fastOutSlowIn,
+        )
+      ),
+    );
+  }
+  @override Duration get transitionDuration => const Duration(milliseconds: 400);
+}
+
+class Tabs extends StatefulWidget {
+@override
+  TabsState createState() => new TabsState();
+}
+
+class TabsState extends State<Tabs> {
+    PageController _tabController;
+
+  var _title_app = null;
+  int _tab = 0;
+
+  @override
+ void initState() {
+    super.initState();
+    _tabController = new PageController();
+    this._title_app = TabItems[0].title;
+ }
+
+  @override
+  void dispose(){
+    super.dispose();
+    _tabController.dispose();
+  }
+    @override
+  Widget build (BuildContext context) => new Scaffold(
+
+    //App Bar
+    appBar: new AppBar(
+      title: new Text(
+        _title_app, 
+        style: new TextStyle(
+          fontSize: Theme.of(context).platform == TargetPlatform.iOS ? 17.0 : 20.0,
+        ),
+      ),
+      elevation: Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
+    ),
+
+    //Content of tabs
+    body: new PageView(
+      controller: _tabController,
+      onPageChanged: onTabChanged,
+      children: <Widget>[
+        new _firstTab.Residences(),
+        new _secondTab.CoWorkSpace(),
+        new _thirdTab.Support()
+      ],
+    ),
+
+    //Tabs
+    bottomNavigationBar: Theme.of(context).platform == TargetPlatform.iOS ?
+      new CupertinoTabBar(
+        activeColor: Colors.blueGrey,
+        currentIndex: _tab,
+        onTap: onTap,
+        items: TabItems.map((TabItem) {
+          return new BottomNavigationBarItem(
+            title: new Text(TabItem.title),
+            icon: new Icon(TabItem.icon),
+          );
+        }).toList(),
+      ):
+      new BottomNavigationBar(
+        currentIndex: _tab,
+        onTap: onTap,
+        items: TabItems.map((TabItem) {
+          return new BottomNavigationBarItem(
+            title: new Text(TabItem.title),
+            icon: new Icon(TabItem.icon),
+          );
+        }).toList(),
+    ),
+
+    //Drawer
+    drawer: new Drawer(
+      child: new ListView(
+        children: <Widget>[
+          new Container(
+            height: 120.0,
+            child: new DrawerHeader(
+              padding: new EdgeInsets.all(0.0),
+              decoration: new BoxDecoration(
+                color: new Color(0xFFECEFF1),
+              ),
+              child: new Center(
+                child: new FlutterLogo(
+                  colors: Colors.blueGrey,
+                  size: 54.0,
+                ),
+              ),
+            ),
+          ),
+          new ListTile(
+            leading: new Icon(Icons.chat),
+            title: new Text('Support'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).pushNamed('/support');
+            }
+          ),
+          new ListTile(
+            leading: new Icon(Icons.info),
+            title: new Text('About'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).pushNamed('/about');
+            }
+          ),
+          new ListTile(
+              leading: new Icon(Icons.home),
+              title: new Text('Residences'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).pushNamed('/residences');
+              }
+          ),
+          new ListTile(
+              leading: new Icon(Icons.work),
+              title: new Text('Co-Work Space'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).pushNamed('/coworkspace');
+              },
+          ),
+          new ListTile(
+            leading: new Icon(Icons.work),
+            title: new Text('Lodgings'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).pushNamed('/lodgings');
+            },
+          ),
+          new ListTile(
+            leading: new Icon(Icons.work),
+            title: new Text('Medical Activity'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).pushNamed('/medicalactivity');
+            },
+          ),
+          new ListTile(
+            leading: new Icon(Icons.work),
+            title: new Text('Student Exchange Activity'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).pushNamed('/studentexchangeactivity');
+            },
+          ),
+          new ListTile(
+            leading: new Icon(Icons.work),
+            title: new Text('Privileges'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).pushNamed('/privileges');
+            },
+          ),
+          new ListTile(
+            leading: new Icon(Icons.work),
+            title: new Text('Lodgings Details'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.of(context).pushNamed('/lodgingsdetails');
+            },
+          ),
+          new Divider(),
+          new ListTile(
+              leading: new Icon(Icons.launch),
+              title: new Text('Log In'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).pushNamed('/login');
+              }
+          ),
+          new ListTile(
+            leading: new Icon(Icons.exit_to_app),
+            title: new Text('Sign Out'),
+            onTap: () {
+              Navigator.pop(context);
+            }
+          ),
+          new ListTile(
+              leading: new Icon(Icons.launch),
+              title: new Text('Registration'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.of(context).pushNamed('/registration');
+              }
+          ),
+        ],
+      )
+    )
+  );
+
+  void onTap(int tab){
+    _tabController.jumpToPage(tab);
+  }
+
+  void onTabChanged(int tab) {
+    setState((){
+      this._tab = tab;
+    });
+
+    switch (tab) {
+      case 0:
+        this._title_app = TabItems[0].title;
+      break;
+
+      case 1:
+        this._title_app = TabItems[1].title;
+      break;
+
+      case 2:
+        this._title_app = TabItems[2].title;
+      break;
+    }
+  }
+}
+
+class TabItem {
+  const TabItem({ this.title, this.icon });
+  final String title;
+  final IconData icon;
+}
+
+const List<TabItem> TabItems = const <TabItem>[
+  const TabItem(title: 'Residences', icon: Icons.home),
+  const TabItem(title: 'Co-Work Space', icon: Icons.dashboard),
+  const TabItem(title: 'Support Enquiries', icon: Icons.settings)
+];
